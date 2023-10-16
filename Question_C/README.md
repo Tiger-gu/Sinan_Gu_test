@@ -41,6 +41,11 @@ e. data consistency to some degrees.
 
 f. Cache can expire.
 
+g. (No sure) Simplicty to integrate?
+
+(Once deployed to the cloud, no matter what languages Ormuco uses, it just needs to send 
+requests to this cache service with JSON).
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Missing functionalities:
@@ -156,6 +161,8 @@ How to test this project locally:
        a different port.
 
     2. First, run the ZooKeeper Server. 
+    (Go to https://zookeeper.apache.org/. Download it and unpack it. Change .cfg file in the conf folder to zoo.config.
+     set a folder called logs in the root directory. In the zoo.config, set the dataDir to the logs folder location )
     (For Linux: go to the bin folder and run ./zkServer.sh
      For Windows: go to the bin folder and run zkServer.cmd in command prompt)
 
