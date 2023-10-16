@@ -42,9 +42,13 @@ e. data consistency to some degrees.
 f. Cache can expire.
 
 g. (No sure) Simplicty to integrate?
-
 (Once deployed to the cloud, no matter what languages Ormuco uses, it just needs to send 
 requests to this cache service with JSON).
+
+h. Flexible Schema(Unsure)
+I look at the definition of flexible schema in mongoDB. That is why I choose the data type String for the cache storage.
+This project doesn't control the structure. String can be Json Strings which contains complex nested
+structure. Or it can just be a simple String.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
