@@ -58,8 +58,9 @@ public class CacheController {
     // The difference is that if the master node can not find the
     // value assosiated with the key, the master will just return null,
     // whereas if a slave node cannot find the value assosiated with the key,
-    // the slave node will ask the master for assistance first before returning
-    // null.
+    // the slave node will return null to the client and clandestinely ask the master
+    // through the existing websocket channel whether it knows anything related to the key.
+    // Please see the Storage folder
     @GetMapping(value="/get/{key}")
     public ResponseEntity<String> answer(@PathVariable("key") String key) {
         String value;
@@ -70,7 +71,10 @@ public class CacheController {
         } catch (Exception e) {
             masterId = nodeId;
         }
-
+        // This isMaster boolean indicator indicates whether a node
+        // is a master node. If a node is already a master node,
+        // the node should just return null if it cannot find the
+        // value assosiated with the key.
         if (masterId.equals(this.nodeId)) {
             value = cache.get(key, true);
         } else {

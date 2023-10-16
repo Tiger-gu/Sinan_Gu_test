@@ -18,7 +18,7 @@ public class NodeRegistry implements Watcher{
     private String currentZnode = null;
     private List<String> allSlavesAddresses = null;
 
-    private void  createServiceRegistryZnode() {
+    private void  createNodeRegistryZnode() {
         // Don't need to wory about race conditions, since ZooKeeper server only allows
         // one create method call for a specific znode path. Duplicate calls will result in
         // KeeperException
@@ -52,10 +52,6 @@ public class NodeRegistry implements Watcher{
         System.out.println("Watching all The cluster addresses: " + this.allSlavesAddresses.toString());
     }
 
-    protected void updateZookeeper(ZooKeeper zookeeper) {
-        this.zookeeper = zookeeper;
-    }
-
     protected synchronized List<String> getAllSlavesAddresses() throws KeeperException, InterruptedException{
         if (this.allSlavesAddresses == null) {
             updateSlavesAddresses();
@@ -78,7 +74,9 @@ public class NodeRegistry implements Watcher{
     }
 
     // In case that a node becomes a master, it removes itself from the list of slave nodes
-    // the master watches over. Also, it stores its own address to the registry znode.
+    // the master watches over. Also, it stores its own nodeId to the registry znode. Why?
+    // Note that when a slave node sends messages to the master node, 
+    // the master's nodeId will be crucial for the message to reach the right master node.
     protected void unregisteredFromCluster(String masterId) throws KeeperException, InterruptedException{
         if (currentZnode != null && zookeeper.exists(currentZnode, false) != null) {
             zookeeper.delete(currentZnode, -1);
@@ -98,12 +96,13 @@ public class NodeRegistry implements Watcher{
     protected NodeRegistry(ZooKeeper zooKeeper) {
         this.zookeeper = zooKeeper;
         this.allSlavesAddresses = null;
-        createServiceRegistryZnode();
+        createNodeRegistryZnode();
     }
 
     @Override
     public void process(WatchedEvent e) {
-        // if there is any change to the list of slave nodes.
+        // if there is any change to the list of slave nodes
+        // (e.g. some nodes down, new nodes joining in),
         // re-register to get the latest slaves addresses.
         registerForUpdates();
     }

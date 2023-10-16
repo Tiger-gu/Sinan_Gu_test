@@ -28,10 +28,14 @@ public class StorageService {
 
     public String get(String key, Boolean isMaster) {
         String result = this.storage.getIfPresent(key);
+        // if the node is a slave and this node cannot find the 
+        // value assosiated with that key, then take advantage of
+        // the established websocket channel and send a help message.
         if (result == null && !isMaster) {
             WsMessage msg = new WsMessage("get-help", key);
             try {
-                this.simpMessagingTemplate.convertAndSend("/topic/"+ coordinator.getMasterId() + "/help", msg);
+                this.simpMessagingTemplate.convertAndSend(
+                    "/topic/"+ coordinator.getMasterId() + "/help", msg);
             } catch (Exception e) {}
         }
         return result;
@@ -42,6 +46,8 @@ public class StorageService {
     }
 
     public StorageService() {
+        // When the maximum size is set, the Google Guava cache library
+        // will use LRU as the cache evicion strategy.
         this.storage = CacheBuilder.newBuilder()
         .maximumSize(100)
         .expireAfterWrite(Duration.ofMinutes(1))

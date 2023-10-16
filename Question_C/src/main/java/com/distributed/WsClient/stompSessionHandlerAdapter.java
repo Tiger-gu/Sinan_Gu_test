@@ -40,7 +40,8 @@ public class stompSessionHandlerAdapter extends StompSessionHandlerAdapter {
         } else if (msg.getType().equals("delete-confirmation")) {
             if (!msg.getContent().equals("Fail")) System.err.print("Sync: DELETE failed");
         } else if (msg.getType().equals("get-help")) {
-            CacheEntry entry = new CacheEntry(msg.getContent(), cache.get(msg.getContent(), true));
+            CacheEntry entry = new CacheEntry(msg.getContent(), 
+                                              cache.get(msg.getContent(), true));
             session.send("/app/sync/help", entry);
         } else if (msg.getType().equals("pong")) {
             //System.out.println("ping success!");
@@ -54,7 +55,8 @@ public class stompSessionHandlerAdapter extends StompSessionHandlerAdapter {
     }
 
     @Override
-    public void handleException(StompSession session, @Nullable StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
+    public void handleException(StompSession session, @Nullable StompCommand command, 
+                                StompHeaders headers, byte[] payload, Throwable exception) {
         System.err.println(exception.getMessage());
     }
 

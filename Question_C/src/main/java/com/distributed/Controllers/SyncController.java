@@ -23,6 +23,9 @@ public class SyncController {
     @Autowired
     private StorageService cache;
     
+    // This is the websocket controller. If a node recieves a 
+    // sync-put noification, it will perform the put operation
+    // as required by the master.
     @MessageMapping("/sync/put")
     public void sync_put(@Payload WsNotification notification) {
         WsMessage msg;
@@ -41,6 +44,7 @@ public class SyncController {
         this.simpMessagingTemplate.convertAndSend("/topic/"+ notification.getMasterId() + "/put", msg);
     }
 
+    // Similar to the above sync-put controller, this is the sync-delete controller.
     @MessageMapping("/sync/delete")
     public void sync_delete(@Payload WsNotification notification) {
         WsMessage msg;
@@ -56,12 +60,20 @@ public class SyncController {
         msg = new WsMessage("delete-confirmation", "Succeed");
         this.simpMessagingTemplate.convertAndSend("/topic/"+ notification.getMasterId() + "/delete", msg);
     }
-
+    // If a node gets a new entry from sync-help, that means the master node
+    // has found what this node cannot find. Therefore, this node should immediately
+    // seek to store the information so to keep in sync with the master node.
     @MessageMapping("/sync/help")
     public void sync_delete(@Payload CacheEntry entry) {
         this.cache.put(entry.getKey(), entry.getValue());
     }
 
+    // If a node get ping notification, that is just the master's periodic check(every 1 second)
+    // on slaves. Therefore, this node will respond with a message of type "pong"
+    // and content "ok". This is to critical to establish / maintain websocket session,
+    // For example, in the case that the old master was down and a new master was just elected.
+    // This ping-pong mechnnism helps the new master to establish websocket connections to 
+    // slaves.
     @MessageMapping("/sync/ping")
     public void pong(@Payload WsNotification notification) {
         WsMessage msg = new WsMessage("pong", "ok");

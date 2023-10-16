@@ -10,6 +10,9 @@ import com.distributed.WsClient.StompClient;
 
 @Configuration
 public class CommonConfig {
+    // Each server/node has its own unique id.
+    // When a node becomes the master node, its nodeId
+    // will serve as its master Id.
     @Bean
     public String nodeId() {
         return UUID.randomUUID().toString();                      

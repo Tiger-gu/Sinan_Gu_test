@@ -11,6 +11,7 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 
+// This class implements the zookeeper watcher interface
 @Service
 public class CoordinationService implements Watcher{
     private static final String ZOOKEEPER_ADDRESS = "localhost:2181";
@@ -22,6 +23,10 @@ public class CoordinationService implements Watcher{
     private String nodeId;
 
     private void setUp() throws IOException, KeeperException, InterruptedException{
+        // This not only create a connection to the zookeeper server, but it also
+        // registers a watcher on the zookeeper. When this node is connected to the
+        // zookeeper, another event thread spawned by the zookeeper will call the
+        // the overriden process method.
         this.zookeeper = new ZooKeeper(ZOOKEEPER_ADDRESS, SESSION_TIMEOUT, this);
         this.serviceRegistry = new NodeRegistry(this.zookeeper);
         OnElectionAction onElectionAcion = new OnElectionAction(this.serviceRegistry, currentServerPort, nodeId);

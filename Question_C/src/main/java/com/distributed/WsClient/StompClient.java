@@ -24,7 +24,8 @@ public class StompClient {
     public synchronized void connect(String url, WsNotification notification, StorageService cache) {
         try {
             if (this.stompSession == null || (!stompSession.isConnected())) {
-                this.stompSession = stompClient.connectAsync(url, new stompSessionHandlerAdapter(notification, cache)).get();
+                this.stompSession = stompClient.connectAsync(
+                    url, new stompSessionHandlerAdapter(notification, cache)).get();
             } else {
                 this.stompSession.send("/app/sync/" + notification.getAction(), notification);
             }
